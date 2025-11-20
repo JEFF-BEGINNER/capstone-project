@@ -1,0 +1,462 @@
+/* ==================== Global ==================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+body {
+  background: #f0f2f5;
+  color: #333;
+  overflow-x: hidden;
+}
+
+/* ==================== Sidebar ==================== */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(145deg, #005bea, #00c6fb); /* container gradient */
+  backdrop-filter: blur(15px);
+  color: white;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  box-shadow: 4px 0 30px rgba(0,0,0,0.15);
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  z-index: 100;
+}
+
+.sidebar .logo {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 35px;
+  letter-spacing: 2px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+}
+
+.sidebar .profile {
+  text-align: center;
+  margin-bottom: 50px;
+}
+.profile-image-container img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  transition: all 0.3s ease;
+}
+.profile-image-container img:hover {
+  transform: scale(1.15) rotate(3deg);
+}
+
+.profile-btn {
+  margin-top: 12px;
+  background: linear-gradient(135deg, #7BC0F5, #3891D6);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 14px;
+  cursor: pointer;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
+}
+.profile-btn:hover {
+  background: linear-gradient(135deg, #3891D6, #2a6aa0);
+  transform: translateY(-3px) scale(1.05);
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.nav-links a {
+  display: block;
+  padding: 14px 18px;
+  border-radius: 14px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.nav-links a:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateX(8px) scale(1.02);
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+/* ==================== Top Bar ==================== */
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 30px;
+  background: linear-gradient(145deg, #005bea, #00c6fb);
+  color: white;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.top-bar .icons {
+  display: flex;
+  gap: 16px;
+}
+.top-bar .icons button {
+  width: 48px;
+  height: 48px;
+  font-size: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
+}
+.top-bar .icons button:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.15) rotate(-5deg);
+}
+
+/* Subject Button */
+.subject-btn {
+  padding: 10px 18px;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #7BC0F5, #3891D6);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
+}
+.subject-btn:hover {
+  background: linear-gradient(135deg, #3891D6, #2a6aa0);
+  transform: scale(1.05);
+}
+
+/* Subject Input Modal */
+#subjectModal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+#subjectModal .modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  width: 350px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+#subjectModal .modal-content h2 {
+  margin-bottom: 20px;
+}
+#subjectModal .input-wrapper {
+  display: flex;
+  gap: 10px;
+}
+#subjectModal .input-wrapper input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+#subjectModal .input-wrapper button {
+  background: #3891D6;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+#subjectModal .input-wrapper button:hover {
+  background: #2a6aa0;
+}
+
+
+/* Settings Dropdown */
+.settings {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  background: rgba(56,145,214,0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.settings button {
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: none;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.settings button:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateX(4px);
+}
+
+/* ==================== Main Content ==================== */
+.main-content {
+  margin-left: 260px;
+  padding: 35px;
+  min-height: 100vh;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #FDFD96, #7BC0F5, #FFBBC8);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color: #333;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+}
+
+/* Gradient animation */
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Quick Access Cards */
+.quick-access {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-top: 40px;
+}
+.card {
+  flex: 1 1 220px;
+  padding: 80px;
+  border-radius: 24px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 12px 25px rgba(0,0,0,0.25);
+  transition: all 0.4s ease;
+  background: rgba(255,255,255,0.3);
+  backdrop-filter: blur(10px);
+}
+.card:hover {
+  transform: translateY(-10px) scale(1.05) rotateX(3deg);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+}
+
+/* Card Colors */
+.card.yellow { background: rgba(253,253,150,0.35); color: #333; }
+.card.red { background: rgba(255,187,200,0.35); color: #333; }
+.card.blue { background: rgba(123,192,245,0.35); color: #fff; }
+
+/* ==================== Dark Mode ==================== */
+.main-content.dark-mode {
+  background: linear-gradient(135deg, #222, #333, #444);
+  color: #e0e0e0;
+}
+.main-content.dark-mode .card.yellow { background: rgba(255,227,84,0.25); color: #fff; }
+.main-content.dark-mode .card.red { background: rgba(136,43,59,0.25); color: #fff; }
+.main-content.dark-mode .card.blue { background: rgba(58,110,165,0.25); color: #fff; }
+
+/* ==================== Profile Section ==================== */
+.profile-edit-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 50px;
+  margin-top: 30px;
+  justify-content: flex-start;
+}
+
+/* Glassmorphic card for avatar and fields */
+.profile-avatar-section,
+.profile-fields {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  border-radius: 24px;
+  padding: 25px 30px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
+}
+
+/* Avatar Preview */
+.large-avatar-preview {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.large-avatar-preview img {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.8);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+  object-fit: cover;
+  transition: all 0.4s ease;
+}
+.large-avatar-preview img:hover {
+  transform: scale(1.1) rotate(-5deg);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.45), 0 0 15px rgba(123,192,245,0.5);
+}
+
+/* Avatar selection carousel */
+.avatar-selection {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 15px;
+}
+.avatar-selection img {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+.avatar-selection img:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.avatar-selection img.selected {
+  border-color: #7BC0F5;
+  box-shadow: 0 6px 18px rgba(123,192,245,0.5);
+}
+
+/* Editable Profile Fields */
+.profile-fields {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.editable-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.editable-input input {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.3s ease;
+}
+.editable-input input:focus {
+  border-color: #7BC0F5;
+  box-shadow: 0 0 12px rgba(123,192,245,0.6);
+  background: rgba(255,255,255,0.25);
+}
+.edit-icon {
+  position: absolute;
+  right: 12px;
+  font-size: 18px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.edit-icon:hover {
+  transform: scale(1.2);
+  color: #7BC0F5;
+}
+
+/* Save Button */
+.save-section {
+  text-align: center;
+  margin-top: 15px;
+}
+.save-button {
+  background: linear-gradient(135deg, #7BC0F5, #3891D6);
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 12px 30px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+  transition: all 0.3s ease;
+}
+.save-button:hover {
+  background: linear-gradient(135deg, #3891D6, #2a6aa0);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.45), 0 0 12px rgba(123,192,245,0.6);
+}
+
+/* Dark mode adjustments for profile */
+.main-content.dark-mode .profile-avatar-section,
+.main-content.dark-mode .profile-fields {
+  background: rgba(0,0,0,0.25);
+  color: #e0e0e0;
+}
+.main-content.dark-mode .editable-input input {
+  color: #fff;
+  border-color: rgba(255,255,255,0.2);
+}
+.main-content.dark-mode .editable-input input:focus {
+  box-shadow: 0 0 12px rgba(123,192,245,0.8);
+}
+.main-content.dark-mode .edit-icon:hover {
+  color: #7BC0F5;
+}
+
+/* ==================== Modals ==================== */
+/* Modal overlay */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+}
+
+/* Show modal */
+.modal:not(.hidden) {
+  display: flex;
+}
+
+/* Adjust close button position inside modal */
+.modal .close-modal {
+  position: absolute;
+  cursor: pointer;
+}

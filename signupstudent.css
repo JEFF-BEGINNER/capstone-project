@@ -1,0 +1,297 @@
+/* ================= Global Styles ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #667eea, #764ba2, #6dd5ed, #2193b0);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* ================= Container ================= */
+/* ================= Container ================= */
+.container {
+  background: linear-gradient(145deg, #005bea, #00c6fb); /* bagong background */
+  backdrop-filter: blur(15px);
+  padding: 50px 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  position: relative;
+}
+
+/* ================= Form Containers ================= */
+.form-container,
+.signup-container {
+  padding: 40px 35px;
+  border-radius: 25px;
+   background: linear-gradient(145deg, #005bea, #00c6fb);
+  box-shadow: 
+    0 12px 28px rgba(0, 0, 0, 0.35),
+    0 6px 12px rgba(0, 0, 0, 0.2) inset;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  animation: slideUp 0.8s ease forwards;
+  max-width: 1000px;
+  width: 100%;
+  min-height: 650px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+
+.form-container:hover,
+.signup-container:hover {
+  transform: scale(1.01); /* slight lift */
+  box-shadow: 
+    0 16px 36px rgba(0, 0, 0, 0.45), 
+    0 8px 16px rgba(0, 0, 0, 0.25) inset;
+}
+
+
+/* ================= Form Layout ================= */
+form {
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+/* ================= Inputs ================= */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+  transition: 0.4s;
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+input::placeholder {
+  color: #ccc;
+}
+
+input:focus,
+select:focus {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 12px #0077ff, 0 0 20px rgba(30, 144, 255, 0.6);
+  transform: scale(1.02);
+}
+
+/* ================= Buttons ================= */
+.signup-btn {
+  width: 100%;
+  padding: 14px 30px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #f6d365, #fda085) !important;
+  color: #333;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+}
+
+.signup-btn:hover {
+  background: linear-gradient(135deg, #1e90ff, #3399ff);
+  box-shadow: 0 10px 35px rgba(0, 119, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+/* ================= Checkbox / Terms ================= */
+.checkbox {
+  text-align: center;
+  margin: 20px 0;
+  font-size: 0.95rem;
+  color: #eee;
+}
+
+.checkbox a {
+  color: #ffdd57;
+  text-decoration: none;
+}
+
+.checkbox a:hover {
+  text-decoration: underline;
+  text-shadow: 0 0 6px rgba(255, 221, 87, 0.9);
+}
+
+/* ================= Links ================= */
+.login-link {
+  font-size: 1rem;
+  margin-top: 20px;
+  color: #eee;
+}
+
+.login-link a {
+  color: #ffdd57;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+  text-shadow: 0 0 8px rgba(255, 221, 87, 0.9);
+}
+
+/* ================= Modal ================= */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  position: relative; /* << para dumikit si X sa loob */
+  background: #fff;
+  color: #333;
+  padding: 25px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  animation: scaleUp 0.4s ease forwards;
+}
+
+
+.close-modal {
+  position: absolute;
+  top: 15px;
+  left: 20px; /* dati right: 20px; */
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.close-modal:hover {
+  color: #ff3b3b;
+  transform: scale(1.2);
+}
+
+
+/* ================= Utilities ================= */
+.hidden {
+  display: none !important;
+}
+
+/* ================= Animations ================= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ================= Responsive ================= */
+@media (max-width: 480px) {
+  .container {
+    height: auto;
+    padding: 20px;
+    max-width: 95%;
+    min-height: auto;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .signup-btn {
+    padding: 14px;
+  }
+}
+/* Close button sa signup form */
+/* ================= Close Button (X) ================= */
+.close-btn {
+  position: absolute;
+  top: 15px;         /* slightly closer to top */
+  right: 15px;       /* aligned to right */
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15); /* subtle glassy look */
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: bold;
+  border-radius: 50%;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  background: #ff3b3b;
+  color: #fff;
+  transform: scale(1.2);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+/* ================= Dropdown (Section) ================= */
+select {
+  appearance: none;          /* alisin default style ng browser */
+  -webkit-appearance: none;  /* para sa Safari/Chrome */
+  -moz-appearance: none;     /* para sa Firefox */
+  background: #fff;          /* white background */
+  color: #000;               /* black text */
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+select option {
+  background: #fff;          /* white dropdown */
+  color: #000;               /* black text */
+}

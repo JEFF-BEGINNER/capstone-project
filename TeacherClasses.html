@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Teacher Classes</title>
+    <link rel="stylesheet" href="Teacherdashboard.css" />
+    <link rel="stylesheet" href="TeacherClasses.css" />
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">QUIZ</div>
+
+        <div class="teacher-profile">
+            <img id="sidebarProfile" src="../image/teacher1.jpg" alt="Teacher Profile" onclick="openProfileModal()" />
+            <p><strong id="teacherName"><?php echo htmlspecialchars($name); ?></strong><br>Teacher Name</p>
+            <a href="TeacherViewProfile.html" Class="profile-btn" onclick="showProfile()">👤 View Profile</a>
+        </div>
+
+        <nav class="nav-links">
+            <a href="Teacherdashboard.html" onclick="showSection('home')">🏠 Home</a>
+            <a href="TeacherClasses.html" onclick="showSection('classes')">📚 Classes</a>
+            <a href="TeacherCreate.html" onclick="showSection('createquiz')">➕ Create Quiz</a>
+            <a href="TeacherClassReport.html" onclick="showSection('classReport')">📋 Class Report</a>
+            <a href="TeacherQuizzes.html" onclick="openQuizzes('quizzes')">📝 Quizzes</a>
+            <a href="#" onclick="openAbout()">ℹ️ About</a>
+        </nav>
+    </aside>
+
+    <!-- Secondary sidebar (classes rail) copied from Class Report for consistent UI -->
+    <aside class="secondary-sidebar classes" id="secondarySidebar" aria-hidden="false">
+        <div class="ss-top">
+            <button class="icon-btn ss-hamburger" id="ssHamburger" aria-label="Menu">☰</button>
+        </div>
+
+        <nav class="ss-class-list" aria-label="Classes">
+            <button class="ss-class-item active" data-name="Class 1">Class 1</button>
+            <button class="ss-class-item" data-name="Class 2">Class 2</button>
+            <button class="ss-class-item" data-name="Class 3">Class 3</button>
+            <button class="ss-class-item" data-name="Class 4">Class 4</button>
+            <button class="ss-class-item" data-name="Class 5">Class 5</button>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content" id="mainContent">
+        <header>
+            <button id="toggleSecondaryBtn" class="icon-btn" aria-label="Toggle navigation">≡</button>
+            <span id="sectionTitle">Classes</span>
+            <div class="top-bar-buttons">
+                <button class="icon-btn" id="notificationBtn">🔔</button>
+                <button class="icon-btn" id="darkModeBtn">🌙</button>
+                <div class="settings-dropdown">
+                    <button class="icon-btn" id="settingsBtn">⚙️</button>
+                    <div class="settings-menu" id="settingsMenu">
+                        <button id="logoutBtn">Log out</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Class selection moved to the left rail (dropdown removed) -->
+
+        <!-- Student list (blue framed card) -->
+        <section class="student-list-card" style="padding:24px 24px 0 24px;">
+            <div class="student-card">
+                <div class="student-card-header">
+                    <div class="student-actions">🔗</div>
+                    <div class="student-code">QDNDHTDH</div>
+                </div>
+                <div class="student-list">
+                    <!-- repeated items (example) -->
+                    <div class="student-item"><img src="../image/teacher1.jpg" alt="avatar"/><span>Student name</span></div>
+                    <div class="student-item"><img src="../image/teacher2.jpg" alt="avatar"/><span>Student name</span></div>
+                    <div class="student-item"><img src="../image/teacher3.jpg" alt="avatar"/><span>Student name</span></div>
+                    <div class="student-item"><img src="../image/teacher4.jpg" alt="avatar"/><span>Student name</span></div>
+                    <div class="student-item"><img src="../image/teacher5.jpg" alt="avatar"/><span>Student name</span></div>
+                    <div class="student-item"><img src="../image/teacher1.jpg" alt="avatar"/><span>Student name</span></div>
+                    <div class="student-item"><img src="../image/teacher2.jpg" alt="avatar"/><span>Student name</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Modal -->
+        <div id="aboutModal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeAbout()">×</span>
+                <h1>About</h1>
+                <p>AI-POWERED ADAPTIVE QUIZ SYSTEM WITH REAL-TIME PERFORMANCE ANALYTICS FOR GRADE 10 STUDENTS.</p>
+                <section>
+                    <p>This web application provides an intelligent and personalized learning experience through adaptive quizzes powered by AI.</p>
+                    <p><strong>Key Features:</strong></p>
+                    <ul>
+                        <li>AI-generated quizzes tailored to each student's current level</li>
+                        <li>Real-time performance tracking and analytics dashboard</li>
+                        <li>Curriculum-based content for Grade 10 subjects</li>
+                        <li>Performance monitoring tools for teachers and administrators</li>
+                        <li>Supports personalized feedback</li>
+                        <li>Secure student profiles and data management</li>
+                        <li>Optimized for mobile and desktop</li>
+                        <li>Accessible anytime</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <!-- Profile Modal -->
+        <div id="profileModal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeProfileModal()">×</span>
+                <h1>Select Your Profile</h1>
+                <div class="profile-options">
+                    <img src="../image/teacher1.jpg" onclick="selectProfile(this)" />
+                    <img src="../image/teacher2.jpg" onclick="selectProfile(this)" />
+                    <img src="../image/teacher3.jpg" onclick="selectProfile(this)" />
+                    <img src="../image/teacher4.jpg" onclick="selectProfile(this)" />
+                    <img src="../image/teacher5.jpg" onclick="selectProfile(this)" />
+                </div>
+            </div>
+        </div>
+
+        </div>
+        </div>
+
+        <script>
+            const settingsBtn = document.getElementById('settingsBtn');
+            const settingsMenu = document.getElementById('settingsMenu');
+            const notificationBtn = document.getElementById('notificationBtn');
+            const darkModeBtn = document.getElementById('darkModeBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const aboutModal = document.getElementById('aboutModal');
+            const profileModal = document.getElementById('profileModal');
+            const sidebarProfile = document.getElementById('sidebarProfile');
+
+            // class selection
+            document.querySelectorAll('.class-list .item').forEach(el => {
+                el.addEventListener('click', () => {
+                    document.querySelectorAll('.class-list .item').forEach(x => x.classList.remove('active'));
+                    el.classList.add('active');
+                    document.querySelector('.title').textContent = el.textContent.trim() + ' — Quiz 1';
+                });
+            });
+
+            // sidebar nav active state
+            document.querySelectorAll('.sidebar .nav a').forEach(a => {
+                a.addEventListener('click', () => {
+                    document.querySelectorAll('.sidebar .nav a').forEach(x => x.classList.remove('active'));
+                    a.classList.add('active');
+                });
+            });
+
+            // About modal
+            function openAbout() {
+                aboutModal.classList.remove('hidden');
+            }
+
+            function closeAbout() {
+                aboutModal.classList.add('hidden');
+            }
+
+            // Profile modal
+            function openProfileModal() {
+                profileModal.classList.remove('hidden');
+            }
+
+            function closeProfileModal() {
+                profileModal.classList.add('hidden');
+            }
+
+            function selectProfile(img) {
+                sidebarProfile.src = img.src;
+                closeProfileModal();
+            }
+
+            // Close modal when clicking outside
+            window.addEventListener('click', e => {
+                if (e.target === aboutModal) closeAbout();
+                if (e.target === profileModal) closeProfileModal();
+            });
+
+            // Settings dropdown
+            settingsBtn.addEventListener('click', () => {
+                settingsMenu.style.display = settingsMenu.style.display === 'block' ? 'none' : 'block';
+            });
+            document.addEventListener('click', (e) => {
+                if (!settingsBtn.contains(e.target) && !settingsMenu.contains(e.target)) {
+                    settingsMenu.style.display = 'none';
+                }
+            });
+
+            notificationBtn.addEventListener('click', () => alert('No notifications yet!'));
+            darkModeBtn.addEventListener('click', () => document.body.classList.toggle('dark-mode'));
+            logoutBtn.addEventListener('click', () => {
+                settingsMenu.style.display = 'none';
+                if (confirm('Are you sure you want to logout?')) window.location.href = '../HTML/accType.html';
+            });
+
+            // Section navigation
+            function showSection(section) {
+                document.getElementById('sectionTitle').textContent = section.charAt(0).toUpperCase() + section.slice(1);
+            }
+
+                // class-select behavior (updates title and can filter cards)
+                const classSelect = document.getElementById('class-select');
+                if (classSelect) {
+                    classSelect.addEventListener('change', () => {
+                        const selected = classSelect.value;
+                        const title = document.getElementById('sectionTitle');
+                        if (title) title.textContent = 'Classes — ' + selected;
+
+                        // Optional: filter class cards (if present)
+                        document.querySelectorAll('.class-card').forEach(card => {
+                            if (!selected || selected === 'All') { card.style.display = ''; }
+                            else { card.style.display = (card.dataset.class === selected) ? '' : 'none'; }
+                        });
+                    });
+                }
+
+                // --- Secondary sidebar behavior (same as Class Report) ---
+                // clickable list in secondary sidebar
+                const ssClassItems = document.querySelectorAll('.ss-class-item');
+                ssClassItems.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        ssClassItems.forEach(x => x.classList.remove('active'));
+                        btn.classList.add('active');
+                        const name = btn.getAttribute('data-name') || btn.textContent.trim();
+                        const title = document.getElementById('sectionTitle');
+                        if (title) title.textContent = 'Classes — ' + name;
+                        // keep dropdown in sync (if present)
+                        if (classSelect) classSelect.value = name;
+                    });
+                });
+
+                // hamburger behavior for the secondary rail
+                const ssHamburger = document.getElementById('ssHamburger');
+                if (ssHamburger) {
+                    ssHamburger.addEventListener('click', () => {
+                        const sec = document.getElementById('secondarySidebar');
+                        if (!sec) return;
+                        sec.classList.toggle('collapsed');
+                        document.getElementById('mainContent').classList.toggle('with-secondary', !sec.classList.contains('collapsed'));
+                        // Update toggle button visibility
+                        const isCollapsed = sec.classList.contains('collapsed');
+                        if (toggleSecondaryBtn) toggleSecondaryBtn.style.visibility = isCollapsed ? 'visible' : 'hidden';
+                    });
+                }
+
+                // toggle button in header (for small screens / toggling panel)
+                const secondarySidebar = document.getElementById('secondarySidebar');
+                const toggleSecondaryBtn = document.getElementById('toggleSecondaryBtn');
+                const mainContent = document.getElementById('mainContent');
+
+                function updateSecondaryState() {
+                    if (!secondarySidebar) return;
+                    if (window.innerWidth <= 900) {
+                        secondarySidebar.classList.add('collapsed');
+                        secondarySidebar.classList.remove('open');
+                        mainContent.classList.remove('with-secondary');
+                    } else {
+                        secondarySidebar.classList.remove('collapsed');
+                        secondarySidebar.classList.remove('open');
+                        mainContent.classList.add('with-secondary');
+                    }
+                }
+
+                if (toggleSecondaryBtn) {
+                    toggleSecondaryBtn.addEventListener('click', () => {
+                        if (!secondarySidebar) return;
+                        if (window.innerWidth <= 900) {
+                            secondarySidebar.classList.toggle('open');
+                            const newIsOpen = secondarySidebar.classList.contains('open');
+                            mainContent.classList.toggle('with-secondary', newIsOpen);
+                            // Hide button when sidebar is open (visible), show when closed (hidden)
+                            toggleSecondaryBtn.style.visibility = newIsOpen ? 'hidden' : 'visible';
+                        } else {
+                            secondarySidebar.classList.toggle('collapsed');
+                            const newIsCollapsed = secondarySidebar.classList.contains('collapsed');
+                            mainContent.classList.toggle('with-secondary', !newIsCollapsed);
+                            // Show button when sidebar is collapsed (hidden), hide when not collapsed (visible)
+                            toggleSecondaryBtn.style.visibility = newIsCollapsed ? 'visible' : 'hidden';
+                        }
+                    });
+                }
+
+                window.addEventListener('resize', updateSecondaryState);
+                updateSecondaryState();
+        </script>
+</body>
+
+</html>

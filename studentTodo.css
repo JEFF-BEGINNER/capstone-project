@@ -1,0 +1,89 @@
+/* ==================== To-Do Tabs ==================== */
+#todoContent {
+  padding: 20px;
+}
+
+#todoContent .todo-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+#todoContent .tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #7BC0F5;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+#todoContent .tab-btn:hover {
+  background: #3891D6;
+  transform: translateY(-2px);
+}
+
+#todoContent .tab-btn.active {
+  background: #2a6aa0;
+}
+
+/* ==================== To-Do Panels ==================== */
+#todoContent .todo-panel {
+  display: none;
+  background: #fff;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+#todoContent .todo-panel.active {
+  display: block;
+}
+
+/* ==================== To-Do List Items ==================== */
+#todoContent ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#todoContent li {
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+#todoContent li:hover {
+  background: #e8f3fc;
+  transform: scale(1.02);
+}
+
+#todoContent .delete-btn {
+  background: #ff6b6b;
+  border: none;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#todoContent .delete-btn:hover {
+  background: #e63946;
+}
+.assigned-category-panel {
+  display: none;
+}
+.assigned-category-panel.active {
+  display: block;
+}
+

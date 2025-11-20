@@ -1,0 +1,414 @@
+<?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+session_start();
+include "dbconnection.php";
+
+
+// Check login
+if (!isset($_SESSION['student_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$student_id = $_SESSION['student_id'];
+
+// Fetch student info
+$stmt = $conn->prepare("SELECT first_name, last_name, email, student_number, avatar 
+                        FROM student_tbl WHERE student_id = ?");
+$stmt->bind_param("i", $student_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$student = $result->fetch_assoc();
+
+// Data preparation
+if ($student) {
+    $first = $student['first_name'];
+    $last  = $student['last_name'];
+    if (!empty($last) && stripos($first, $last) !== false) {
+        $name = $first;
+    } else {
+        $name = trim($first . " " . $last);
+    }
+
+    $email  = $student['email'] ?? "No Email";
+    $lrn    = $student['student_number'] ?? "N/A";
+    $avatar = $student['avatar'] ?? "image/boy1.jpg";
+} else {
+    $name   = "Student Name";
+    $email  = "No Email";
+    $lrn    = "N/A";
+    $avatar = "image/boy1.jpg";
+}
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="studentdashboard.css" />
+  <link rel="stylesheet" href="about.css" />
+  <link rel="stylesheet" href="studentTodo.css" />
+  <link rel="stylesheet" href="StudentProfile.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="logo">QUIZ</div>
+      <div class="profile">
+        <div class="profile-image-container">
+          <img id="profileImage" src="<?php echo htmlspecialchars($avatar); ?>" alt="Profile" />
+        </div>
+        <p><strong id="studentName"><?php echo htmlspecialchars($name); ?></strong><br>Student</p>
+        <button class="profile-btn" onclick="showProfile()">👤 View Profile</button>
+      </div>
+      <nav class="nav-links">
+        <a href="#" onclick="showHome()">🏠 Home</a>
+        <a href="#" onclick="showSubject('Subject')">📖 Subjects</a>
+        <a href="#" onclick="showTodo()">✅ To-Do</a>
+        <a href="#" onclick="showAbout()">ℹ️ About</a>
+      </nav>
+    </aside>
+
+    <!-- CLASS CODE MODAL -->
+    <div id="classCodeModal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-modal" onclick="closeClassCodeModal()">×</span>
+        <p id="modalMessage"></p>
+      </div>
+    </div>
+
+    <!-- TEMPLATE TOP BAR -->
+<template id="topBarTemplate">
+  <header class="top-bar">
+    <div class="icons left-icons">
+      <!-- Replaced + with Subject button -->
+      <button class="subject-btn" onclick="showSubjectInput()">📖 Subject</button>
+
+      <button class="notification-btn">🔔</button>
+      <button class="darkmode-btn">🌙</button>
+      <button class="settings-btn">⚙️</button>
+      <div id="settingsMenu" class="settings hidden">
+        <button id="logoutBtn">Log out</button>
+      </div>
+    </div>
+  </header>
+</template>
+
+<!-- SUBJECT INPUT MODAL -->
+<div id="subjectModal" class="modal hidden">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeSubjectInput()">×</span>
+    <h2>Enter Subject Name</h2>
+    <div class="input-wrapper">
+      <input type="text" placeholder="Enter subject..." id="subjectInput" />
+      <button id="submitSubject">➤</button>
+    </div>
+  </div>
+</div>
+
+
+    <!-- HOME CONTENT -->
+    <main class="main-content" id="mainHomeContent">
+      <div class="top-bar-container"></div>
+      <section class="quick-access">
+        <div class="card yellow" onclick="showSubject('Subject')">
+          <div class="card-icon">📚</div>
+          <div class="card-title">Subjects</div>
+        </div>
+        <div class="card red" onclick="showTodo()">
+          <div class="card-icon">📝</div>
+          <div class="card-title">To-do</div>
+        </div>
+        <div class="card blue">
+          <div class="card-icon">📂</div>
+          <div class="card-title">All Quizzes</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- SUBJECT -->
+    <div id="subjectContent" class="main-content hidden">
+      <div class="top-bar-container"></div>
+      <div class="section-body">
+        <h2>📖 Subject: <span id="subjectTitle">Subject</span></h2>
+        <div class="subject-member">
+          <img src="image.png/teacher1.png" alt="Teacher Avatar" />
+          <span>Mr. Dela Cruz</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TODO -->
+    <div id="todoContent" class="main-content hidden">
+      <div class="top-bar-container"></div>
+      <div class="section-body">
+        <h2>📝 To-Do List</h2>
+        <div class="todo-tabs">
+          <button class="tab-btn active" onclick="showTodoTab('assigned')">Assigned</button>
+          <button class="tab-btn" onclick="showTodoTab('missing')">Missing</button>
+          <button class="tab-btn" onclick="showTodoTab('done')">Done</button>
+        </div>
+        <div class="todo-panel" id="tab-assigned"><p>No tasks assigned.</p></div>
+        <div class="todo-panel hidden" id="tab-missing"><p>No missing tasks.</p></div>
+        <div class="todo-panel hidden" id="tab-done"><p>No completed tasks yet.</p></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="profileContent" class="main-content hidden">
+      <header class="top-bar">
+        <h2 style="margin-left: 20px;">Profile</h2>
+      </header>
+
+      <div class="profile-edit-wrapper">
+        <!-- Avatar -->
+        <div class="profile-avatar-section">
+          <div class="large-avatar-preview">
+            <img id="bigAvatarPreview" src="<?php echo htmlspecialchars($avatar); ?>" alt="Preview" />
+          </div>
+          <div class="avatar-carousel avatar-selection">
+            <img src="image/boy1.jpg" onclick="selectAvatar(this)" alt="Boy 1">
+            <img src="image/boy2.jpg" onclick="selectAvatar(this)" alt="Boy 2">
+            <img src="image/boy3.jpg" onclick="selectAvatar(this)" alt="Boy 3">
+            <img src="image/girl1.jpg" onclick="selectAvatar(this)" alt="Girl 1">
+            <img src="image/girl2.jpg" onclick="selectAvatar(this)" alt="Girl 2">
+            <img src="image/girl3.jpg" onclick="selectAvatar(this)" alt="Girl 3">
+          </div>
+        </div>
+
+        <!-- Editable Fields -->
+        <div class="profile-fields">
+          <div class="editable-input">
+            <input type="text" id="sidebarName" value="<?php echo htmlspecialchars($name); ?>" />
+            <span class="edit-icon">✏️</span>
+          </div>
+          <div class="editable-input">
+            <input type="email" id="sidebarEmail" value="<?php echo htmlspecialchars($email); ?>" />
+            <span class="edit-icon">✏️</span>
+          </div>
+          <div class="editable-input">
+            <input type="text" id="sidebarLRN" value="<?php echo htmlspecialchars($lrn); ?>" />
+            <span class="edit-icon">✏️</span>
+          </div>
+
+          <div class="save-section">
+            <button class="save-button" onclick="saveProfile()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT MODAL -->
+<div id="aboutModal" class="modal hidden">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeAbout()">×</span>
+    <h1>About</h1>
+    <p>
+      AI-POWERED ADAPTIVE QUIZ SYSTEM WITH REAL-TIME PERFORMANCE ANALYTICS FOR GRADE 10 STUDENTS.
+    </p>
+    <section>
+      <p>
+        This web application is designed to provide an intelligent and personalized learning experience through adaptive quizzes powered by artificial intelligence.
+      </p>
+      <p><strong>Key Features:</strong></p>
+      <ul>
+        <li>AI-generated quizzes tailored to each student's current level</li>
+        <li>Real-time performance tracking and analytics dashboard</li>
+        <li>Curriculum-based content for Grade 10 subjects</li>
+        <li>Performance monitoring tools for teachers and administrators</li>
+        <li>Supports personalized feedback based on individual strengths and weaknesses</li>
+        <li>Secure student profiles and data management</li>
+        <li>Optimized for mobile and desktop devices</li>
+        <li>Accessible anytime, anywhere</li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<script>
+let selectedAvatar = "<?php echo htmlspecialchars($avatar); ?>";
+
+// Sidebar toggle
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('active');
+}
+
+// Dark Mode
+function toggleDarkMode() {
+  document.querySelectorAll(".main-content").forEach(main => {
+    main.classList.toggle("dark-mode");
+  });
+}
+
+// Logout
+function logout() {
+  if (confirm("Are you sure you want to logout?")) {
+    window.location.href = "logout.php";
+  }
+}
+
+// Inject top bar
+function injectTopBar(sectionId) {
+  const section = document.getElementById(sectionId);
+  const topBarContainer = section.querySelector(".top-bar-container");
+  const template = document.getElementById("topBarTemplate");
+
+  topBarContainer.innerHTML = "";
+  const clone = template.content.cloneNode(true);
+  topBarContainer.appendChild(clone);
+
+  const topBar = topBarContainer.querySelector(".top-bar");
+
+  topBar.querySelector(".notification-btn")?.addEventListener("click", () => {
+    alert("No notifications yet!");
+  });
+
+  const darkModeBtn = topBar.querySelector(".darkmode-btn");
+  darkModeBtn?.addEventListener("click", toggleDarkMode);
+
+  const settingsBtn = topBar.querySelector(".settings-btn");
+  const settingsMenu = topBar.querySelector(".settings");
+  settingsBtn?.addEventListener("click", () => {
+    settingsMenu?.classList.toggle("hidden");
+  });
+
+  const logoutBtn = topBar.querySelector("#logoutBtn");
+  logoutBtn?.addEventListener("click", logout);
+
+  // Subject button
+  const subjectBtn = topBar.querySelector(".subject-btn");
+  subjectBtn?.addEventListener("click", () => {
+    document.getElementById("subjectModal").classList.remove("hidden");
+    document.getElementById("subjectModal").style.display = "flex";
+  });
+
+  // Subject modal
+  const subjectInput = document.getElementById("subjectInput");
+  const submitSubject = document.getElementById("submitSubject");
+
+  function handleSubjectSubmit() {
+    const subject = subjectInput.value.trim();
+    if (subject) {
+      showSubject(subject);
+      subjectInput.value = "";
+      document.getElementById("subjectModal").style.display = "none";
+    } else {
+      alert("⚠️ Please enter a subject!");
+    }
+  }
+
+  submitSubject?.addEventListener("click", handleSubjectSubmit);
+  subjectInput?.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSubjectSubmit();
+    }
+  });
+}
+
+// Hide all sections
+function hideAllMain() {
+  document.querySelectorAll(".main-content").forEach(el => el.classList.add("hidden"));
+}
+
+function showHome() {
+  hideAllMain();
+  injectTopBar("mainHomeContent");
+  document.getElementById("mainHomeContent").classList.remove("hidden");
+}
+
+function showSubject(subjectName) {
+  hideAllMain();
+  injectTopBar("subjectContent");
+  document.getElementById("subjectContent").classList.remove("hidden");
+  document.getElementById("subjectTitle").textContent = subjectName;
+}
+
+function showTodo() {
+  hideAllMain();
+  injectTopBar("todoContent");
+  document.getElementById("todoContent").classList.remove("hidden");
+}
+
+function showAbout() {
+  const modal = document.getElementById("aboutModal");
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+}
+
+function closeAbout() {
+  const modal = document.getElementById("aboutModal");
+  modal.classList.add("hidden");
+  modal.style.display = "none";
+}
+
+// Profile
+function showProfile() {
+  hideAllMain();
+  document.getElementById("profileContent").classList.remove("hidden");
+}
+
+function saveProfile() {
+  const name = document.getElementById('sidebarName').value;
+  const email = document.getElementById('sidebarEmail').value;
+  const lrn = document.getElementById('sidebarLRN').value;
+
+  if (!name.trim()) {
+    alert("Name cannot be empty");
+    return;
+  }
+
+  const payload = {
+    name: name,
+    email: email,
+    lrn: lrn,
+    avatar: selectedAvatar
+  };
+
+  fetch('updateProfile.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      alert(data.message);
+      document.getElementById('studentName').textContent = name;
+      document.getElementById('profileImage').src = selectedAvatar;
+      document.getElementById('bigAvatarPreview').src = selectedAvatar;
+
+      localStorage.setItem("studentName", name);
+      localStorage.setItem("studentAvatar", selectedAvatar);
+    } else {
+      alert("Error: " + data.message);
+    }
+  })
+  .catch(err => {
+    alert("An error occurred: " + err);
+  });
+}
+
+
+function selectAvatar(img) {
+  selectedAvatar = img.src;
+  document.querySelectorAll(".avatar-selection img").forEach(el => el.classList.remove("selected"));
+  img.classList.add("selected");
+  document.getElementById("bigAvatarPreview").src = selectedAvatar;
+}
+
+// Initial load
+document.addEventListener("DOMContentLoaded", () => {
+  showHome();
+});
+</script>
+</body>
+</html>

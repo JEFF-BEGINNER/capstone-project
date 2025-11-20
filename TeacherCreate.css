@@ -1,0 +1,343 @@
+/* ---------- Base & Layout ---------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", system-ui, Arial, sans-serif;
+}
+
+:root {
+  --primary: #4A8BEB;
+  --accent: #E270A4;
+  --muted: #f6f8fc;
+  --yellow: #FFD966;
+  --green: #1b8f40;
+  --danger: #b71c1c;
+  --card-bg: #fff;
+  --radius: 14px;
+  --shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+body {
+  background: #f4f7fb;
+  color: #222;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Header ---------- */
+header {
+  background: var(--primary);
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow);
+}
+
+header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  flex: 1;
+}
+
+.back-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.header-buttons a {
+  margin-left: 8px;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.header-buttons a:hover {
+  background: rgba(255,255,255,0.35);
+}
+
+/* ---------- Main Layout ---------- */
+main {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 18px;
+  padding: 20px;
+  flex: 1;
+}
+
+section, aside {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+h2 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--primary);
+}
+
+/* ---------- Saved Quizzes ---------- */
+#quizList {
+  list-style: none;
+  margin-top: 10px;
+}
+
+.quiz-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--muted);
+  padding: 10px;
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.quiz-item:hover {
+  background: #222;
+  color: #fff;
+  cursor: pointer;
+}
+
+.quiz-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 6px;
+  margin-left: 6px;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+
+.quiz-actions button:hover {
+  background: rgba(0,0,0,0.07);
+}
+
+/* ---------- Form ---------- */
+form label {
+  font-size: 14px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-row {
+  margin-bottom: 14px;
+}
+
+input[type="text"],
+textarea,
+select,
+input[type="date"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d6dbe9;
+  border-radius: var(--radius);
+  background: #fff;
+  font-size: 14px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.choice-input {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 6px;
+}
+
+.choice-input input[type="text"] {
+  flex: 1;
+}
+
+.remove-choice {
+  background: var(--danger);
+  border: none;
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.remove-choice:hover {
+  background: #911111;
+}
+
+/* ---------- Buttons ---------- */
+button,
+.add-btn,
+.primary,
+.secondary {
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.add-btn {
+  background: var(--primary);
+  color: #fff;
+}
+
+.add-btn:hover {
+  background: #356ac1;
+}
+
+.primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.primary:hover {
+  background: #cc5c8b;
+}
+
+.secondary {
+  background: var(--muted);
+  color: #333;
+}
+
+.secondary:hover {
+  background: #e1e7f2;
+}
+
+/* ---------- Status ---------- */
+.status-line {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #444;
+}
+
+.status-line .error {
+  color: var(--danger);
+}
+
+/* ---------- Flashcard Preview ---------- */
+.flashcard-preview {
+  margin-top: 18px;
+}
+
+.flashcard-container {
+  background: #fff;
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 18px;
+  width: 100%;
+  max-width: 640px;
+  margin: 12px auto;
+  box-shadow: 0 6px 20px rgba(40,60,120,0.06);
+  text-align: left;
+}
+
+.flashcard-container p {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+/* ---------- Image Preview ---------- */
+#imagePreview, 
+.flashcard-container img {
+  max-width: 100%;
+  max-height: 180px;
+  border-radius: 8px;
+  object-fit: contain;
+  display: block;
+  margin-top: 8px;
+  border: 1px solid #e6e9f2;
+}
+
+/* ---------- Quiz Preview Choices (Improved Color & Hover) ---------- */
+.flashcard-container .options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.flashcard-container .option-btn {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius);
+  border: 1px solid #d6dbe9;
+  background: #f8faff; /* light blue tint */
+  color: #333;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.flashcard-container .option-btn:hover {
+  background: #e9f1ff;
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.flashcard-container .option-btn:active {
+  background: #d9e8ff;
+  transform: scale(0.98);
+}
+
+/* Correct answer (teacher view) */
+.flashcard-container .option-btn.teacher-correct {
+  background: #e7f7ed;
+  border-color: var(--green);
+  color: var(--green);
+  font-weight: 600;
+}
+
+/* ---------- Section Dropdown ---------- */
+#sectionDropdown {
+  position: relative;
+}
+
+#sectionList {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #d6dbe9;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  top: 40px;
+  width: 100%;
+  max-height: 180px;
+  overflow-y: auto;
+  display: none;
+  z-index: 100;
+}
+
+#sectionList div {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#sectionList div:hover {
+  background: #f1f5fb;
+}
+
+/* ---------- Responsive ---------- */
+@media(max-width: 1000px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}

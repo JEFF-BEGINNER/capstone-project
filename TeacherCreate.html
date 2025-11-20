@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" href="TeacherCreate.css" />
+<title>Create Quiz - Full Extended (Server Save)</title>
+</head>
+<body>
+
+<header>
+  <a class="back-link" href="#">← Back</a>
+  <h1>AI Powered Adaptive Quiz System</h1>
+  <div class="header-buttons">
+    <a class="post-button" href="#">📌 Post</a>
+    <a class="ai-button" href="AIGenerate.html">🤖 AI Quiz</a>
+  </div>
+</header>
+
+<main>
+  <!-- Saved Quizzes -->
+  <section id="savedQuizzes" aria-label="Saved Quizzes">
+    <h2>Saved Quizzes</h2>
+    <ul id="quizList"></ul>
+
+    <div style="margin-top:12px; display:flex; gap:8px;">
+      <button id="newQuizBtn" class="add-btn">+ Create New Quiz</button>
+      <button id="refreshListBtn" class="add-btn" style="background:#ffd966">Refresh</button>
+    </div>
+
+    <div class="small-muted" style="margin-top:12px;">
+      Click a quiz to load it into the form for editing. Use the delete (✖) button to remove.
+    </div>
+
+     <div class="flashcard-preview" style="margin-top:20px;">
+    <h3>Quiz Preview</h3>
+    <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
+      <label style="font-weight:700">Mode:</label>
+      <select id="previewMode" style="padding:6px 8px; border-radius:8px; border:1px solid #d6dbe9">
+        <option value="teacher">Teacher (show correct)</option>
+        <option value="student">Student (hide correct)</option>
+      </select>
+      <div style="margin-left:auto">
+        <button id="playQuizBtn" class="add-btn" style="background:#9ad66b">Try Preview</button>
+      </div>
+    </div>
+
+    <div class="flashcard-container" id="flashcardPreview">
+      <p id="previewQuestion">Question will appear here...</p>
+      <img id="previewImage" alt="Preview Image" style="display:none;">
+      <div class="options" id="previewOptions"></div>
+    </div>
+  </div>
+
+  </section>
+
+  <!-- Quiz Form / Creator -->
+  <section id="quizFormContainer" aria-label="Quiz Form">
+    <h2>Quiz Details</h2>
+    <form id="quizForm" onsubmit="return false;">
+
+      <div class="form-row">
+        <label for="quizQuestion">Question:</label>
+        <textarea id="quizQuestion" placeholder="Enter question"></textarea>
+      </div>
+
+      <div class="form-row">
+        <label for="quizImage">Attach Image (optional):</label>
+        <input type="file" id="quizImage" accept="image/*">
+        <img id="imagePreview" alt="Image Preview" style="display:none;">
+      </div>
+
+      <div id="choicesContainer" class="form-row">
+        <label>Answer Choices:</label>
+        <div id="choicesList"></div>
+        <button type="button" id="addChoiceBtn" class="add-btn">+ Add Choice</button>
+      </div>
+
+      <div class="control-row">
+        <button type="button" id="prevQuestionBtn" class="secondary">← Previous</button>
+        <button type="button" id="nextQuestionBtn" class="secondary">Next →</button>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button id="addQuestionToQuizBtn" class="primary" type="button">Edit</button>
+        <button id="saveQuizBtn" class="primary" style="background:#3673c5" type="button">Save</button>
+        <button id="clearCurrentBtn" class="secondary" type="button">Clear Current</button>
+      </div>
+
+      <div id="saveStatus" class="status-line"></div>
+    </form>
+
+    
+  </section>
+
+  <!-- Additional Settings -->
+  <aside id="additionalSettings" aria-label="Additional Settings">
+    <h2>Additional Settings</h2>
+
+     <div class="form-row">
+   <label for="quizTitle">Test Title</label>
+    <input type="text" id="quizTitle" placeholder="Enter test title here..." />
+
+  </div>
+
+    <label for="questionType">Question Type:</label>
+    <select id="questionType">
+      <option value="multipleChoice">Multiple Choice</option>
+      <option value="trueFalse">True / False</option>
+      <option value="shortAnswer">Short Answer</option>
+      <option value="essay">Essay</option>
+    </select>
+
+    <label for="timeLimit">Time:</label>
+    <select id="timeLimit">
+      <option value="15">15 sec</option>
+      <option value="30">30 sec</option>
+      <option value="60">1 min</option>
+      <option value="120">2 min</option>
+      <option value="300">5 min</option>
+      <option value="600">10 min</option>
+    </select>
+
+    <label for="points">Points:</label>
+    <select id="points">
+      <option value="1">1 point</option>
+      <option value="2">2 points</option>
+      <option value="3">3 points</option>
+      <option value="5">5 points</option>
+    </select>
+
+    <label for="sectionSearch">Section:</label>
+    <div id="sectionDropdown">
+      <input type="text" id="sectionSearch" placeholder="Search section..." />
+      <div id="sectionList"></div>
+    </div>
+
+    <label for="quizDate">Date:</label>
+    <input id="quizDate" type="date" />
+
+    <div style="margin-top:18px;">
+      <small class="small">Current Quiz: <strong id="currentQuizLabel">None</strong></small>
+    </div>
+  </aside>
+</main>
+
+<script>
+
+/* ===========================
+   TeacherCreate.js - Cleaned & Optimized
+   =========================== */
+
+/* --------------------------
+   Config & state
+   -------------------------- */
+const API_SAVE = "save_quiz.php";
+const API_LOAD = "load_quizzes.php";
+const API_DELETE = "delete_quiz.php";
+
+const sections = ["Diamond","Agate","Amber","Amethyst","Aquamarine","Citrine","Emerald","Jade","Jasper","Opal","Peridot","Quartz","Ruby","Sapphire"];
+
+let quizzes = [];
+let currentQuiz = { id:null, title:'', published:0, timeLimit:60, points:1, section:'', date:'', questions: [] };
+let currentQuestionIndex = 0;
+let currentImageData = null;
+let studentAnswers = {};
+
+/* --------------------------
+   Element refs
+   -------------------------- */
+const quizList = document.getElementById('quizList');
+const newQuizBtn = document.getElementById('newQuizBtn');
+const refreshListBtn = document.getElementById('refreshListBtn');
+
+const quizTitle = document.getElementById('quizTitle') || (function(){ const i = document.createElement('input'); i.id='quizTitle'; return i; })(); // fallback
+const quizQuestion = document.getElementById('quizQuestion');
+const quizImage = document.getElementById('quizImage');
+const imagePreview = document.getElementById('imagePreview');
+
+const choicesList = document.getElementById('choicesList');
+const addChoiceBtn = document.getElementById('addChoiceBtn');
+
+const prevQuestionBtn = document.getElementById('prevQuestionBtn');
+const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+const addQuestionToQuizBtn = document.getElementById('addQuestionToQuizBtn');
+const saveQuizBtn = document.getElementById('saveQuizBtn');
+const clearCurrentBtn = document.getElementById('clearCurrentBtn');
+
+const questionTypeSelect = document.getElementById('questionType');
+const timeLimitSelect = document.getElementById('timeLimit');
+const pointsSelect = document.getElementById('points');
+const sectionSearch = document.getElementById('sectionSearch');
+const sectionList = document.getElementById('sectionList');
+const quizDate = document.getElementById('quizDate');
+
+const previewQuestion = document.getElementById('previewQuestion');
+const previewImageElem = document.getElementById('previewImage');
+const previewOptions = document.getElementById('previewOptions');
+const previewMode = document.getElementById('previewMode');
+const playQuizBtn = document.getElementById('playQuizBtn');
+
+const currentQuizLabel = document.getElementById('currentQuizLabel');
+const saveStatus = document.getElementById('saveStatus');
+
+/* --------------------------
+   Helpers
+   -------------------------- */
+function uid(){ return 'q_'+Date.now()+'_'+Math.floor(Math.random()*9999); }
+function escapeHtml(s){ return (''+s).replace(/[&<>"']/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* --------------------------
+   Section dropdown
+   -------------------------- */
+function renderSectionList(filter=''){
+  sectionList.innerHTML='';
+  sections.filter(s=>s.toLowerCase().includes(filter.toLowerCase())).forEach(s=>{
+    const d=document.createElement('div'); d.textContent=s;
+    d.onclick = ()=> { sectionSearch.value = s; sectionList.style.display='none'; currentQuiz.section = s; updateCurrentQuizLabel(); };
+    sectionList.appendChild(d);
+  });
+}
+renderSectionList();
+sectionSearch.addEventListener('click', ()=>{ sectionList.style.display='block'; renderSectionList(sectionSearch.value); });
+sectionSearch.addEventListener('input', ()=> renderSectionList(sectionSearch.value));
+document.addEventListener('click', e => { if(!document.getElementById('sectionDropdown').contains(e.target)) sectionList.style.display='none'; });
+
+/* --------------------------
+   Choice inputs & labels
+   -------------------------- */
+function radioGroupName(){ return 'correct_'+(currentQuestionIndex||'new'); }
+function updateChoiceLabels(questionType = 'multiple-choice') {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  Array.from(choicesList.querySelectorAll('.choice-input')).forEach((div, i) => {
+    const label = div.querySelector('.choice-label');
+    if (!label) return;
+
+    // Show letters only for multiple-choice
+    if (questionType === 'multiple-choice') {
+      label.textContent = letters[i] + ".";
+      label.style.display = "inline-block";
+    } else if (questionType === 'true-false') {
+      label.textContent = "";
+      label.style.display = "none";
+    }
+
+    const radio = div.querySelector('input[type="radio"]');
+    if (radio) radio.name = radioGroupName();
+  });
+}
+
+function createChoiceInput(value = '', isCorrect = false, readOnly = false, questionType = 'multiple-choice') {
+  const div = document.createElement('div');
+  div.className = 'choice-input';
+
+  const label = document.createElement('span');
+  label.className = 'choice-label';
+  label.textContent = ''; 
+  label.style.display = (questionType === 'true-false') ? 'none' : 'inline-block';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = questionType === 'true-false' ? 'True or False' : 'Enter choice';
+  input.value = value;
+  if (readOnly) input.readOnly = true;
+
+  const radio = document.createElement('input');
+  radio.type = 'radio';
+  radio.name = radioGroupName();
+  radio.checked = isCorrect;
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'remove-choice';
+  btn.textContent = '✖';
+  btn.onclick = () => {
+    div.remove();
+    updateChoiceLabels(questionType);
+    updatePreview();
+  };
+
+  div.appendChild(label);
+  div.appendChild(radio);
+  div.appendChild(input);
+  div.appendChild(btn);
+
+  return div;
+}
+
+function addChoice(value=''){ choicesList.appendChild(createChoiceInput(value,false)); updateChoiceLabels(); updatePreview(); }
+addChoiceBtn.addEventListener('click', ()=> addChoice());
+
+/* --------------------------
+   Image upload
+   -------------------------- */
+quizImage.addEventListener('change', (e)=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ()=> {
+    currentImageData = reader.result;
+    imagePreview.src = currentImageData; imagePreview.style.display = 'block';
+    updatePreview();
+  };
+  reader.readAsDataURL(f);
+});
+
+/* --------------------------
+   Read current question inputs -> object
+   -------------------------- */
+function getCurrentQuestionFromForm(){
+  const qText = quizQuestion.value.trim();
+  const qType = questionTypeSelect.value;
+  const img = currentImageData || null;
+  const timeLimit = Number(timeLimitSelect.value);
+  const points = Number(pointsSelect.value);
+
+  let choices = [];
+  let correctIndex = null;
+  if(qType === 'multipleChoice' || qType === 'trueFalse'){
+    const divs = Array.from(choicesList.querySelectorAll('.choice-input'));
+    divs.forEach((div, i)=>{
+      const txt = div.querySelector('input[type="text"]').value.trim();
+      const radio = div.querySelector('input[type="radio"]');
+      if(txt){
+        choices.push(txt);
+        if(radio && radio.checked) correctIndex = choices.length - 1;
+      }
+    });
+  } else if(qType === 'shortAnswer' || qType === 'essay'){
+    const ta = choicesList.querySelector('textarea');
+    const model = ta ? ta.value.trim() : '';
+    choices = model ? [model] : [];
+    correctIndex = model ? 0 : null;
+  }
+
+  return {
+    question: qText,
+    questionType: qType,
+    image: img,
+    choices: choices,
+    correctIndex: correctIndex,
+    timeLimit: timeLimit,
+    points: points,
+    section: sectionSearch.value || currentQuiz.section || ''
+  };
+}
+
+
+
+/* --------------------------
+   Populate form from question object
+   -------------------------- */
+function populateFormFromQuestion(obj){
+  quizQuestion.value = obj.question || '';
+  questionTypeSelect.value = obj.questionType || 'multipleChoice';
+  currentImageData = obj.image || null;
+  if(currentImageData){ imagePreview.src = currentImageData; imagePreview.style.display = 'block'; } else { imagePreview.style.display='none'; }
+  choicesList.innerHTML = '';
+  if(obj.questionType === 'multipleChoice'){
+    (obj.choices && obj.choices.length ? obj.choices : ['','','','']).forEach((c, i)=>{
+      const isCorrect = (typeof obj.correctIndex === 'number' && obj.correctIndex === i);
+      choicesList.appendChild(createChoiceInput(c, isCorrect));
+    });
+  } else if(obj.questionType === 'trueFalse'){
+    choicesList.appendChild(createChoiceInput('True', (obj.correctIndex===0), true));
+    choicesList.appendChild(createChoiceInput('False', (obj.correctIndex===1), true));
+  } else if(obj.questionType === 'shortAnswer' || obj.questionType === 'essay'){
+    const ta = document.createElement('textarea');
+    ta.placeholder = obj.questionType === 'shortAnswer' ? 'Correct short answer (optional)' : 'Essay expected answer (optional)';
+    ta.rows = obj.questionType === 'shortAnswer' ? 3 : 6;
+    ta.value = (obj.choices && obj.choices[0]) || '';
+    choicesList.appendChild(ta);
+  }
+  updateChoiceLabels();
+  updatePreview();
+}
+
+/* --------------------------
+   Add / Update question into currentQuiz.questions
+   -------------------------- */
+addQuestionToQuizBtn.addEventListener('click', ()=>{
+  const qObj = getCurrentQuestionFromForm();
+  if(!qObj.question){
+    alert('Please enter the question text.');
+    return;
+  }
+  if(qObj.questionType === 'multipleChoice'){
+    if(qObj.choices.length < 2){
+      alert('Add at least two choices for multiple choice questions.');
+      return;
+    }
+    if(typeof qObj.correctIndex !== 'number'){
+      alert('Select the correct choice with the radio button.');
+      return;
+    }
+  }
+
+  qObj.timeLimit = Number(timeLimitSelect.value);
+  qObj.points = Number(pointsSelect.value);
+  qObj.section = sectionSearch.value || currentQuiz.section || '';
+  qObj.date = quizDate.value || currentQuiz.date || '';
+  qObj.id = qObj.id || ('qq_'+Date.now()+'_'+Math.floor(Math.random()*9999));
+
+  if(currentQuestionIndex >= currentQuiz.questions.length){
+    currentQuiz.questions.push(qObj);
+    currentQuestionIndex = currentQuiz.questions.length - 1;
+  } else {
+    currentQuiz.questions[currentQuestionIndex] = qObj;
+  }
+
+  if(!currentQuiz.title && quizTitle.value.trim()) currentQuiz.title = quizTitle.value.trim();
+
+  updateCurrentQuizLabel();
+  renderLocalQuizItemCount();
+  saveStatus.textContent = 'Question added to the current quiz (not yet saved to server).';
+});
+
+/* --------------------------
+   Save entire quiz to server
+   -------------------------- */
+saveQuizBtn.addEventListener('click', async ()=>{
+  saveStatus.textContent='';
+  const title = quizTitle.value.trim();
+  if(!title){
+    alert('Please put a title for the quiz before saving.');
+    return;
+  }
+  currentQuiz.title = title;
+  currentQuiz.timeLimit = Number(timeLimitSelect.value);
+  currentQuiz.points = Number(pointsSelect.value);
+  currentQuiz.section = sectionSearch.value || currentQuiz.section || '';
+  currentQuiz.date = quizDate.value || currentQuiz.date || '';
+  currentQuiz.published = currentQuiz.published || 0;
+
+  if(!currentQuiz.questions.length){
+    if(!confirm('You have no questions in this quiz. Save empty quiz?')) return;
+  }
+
+  currentQuiz.questions = currentQuiz.questions.map(q=>{
+    if(typeof q.correctIndex === 'number' && q.choices && q.choices[q.correctIndex] !== undefined){
+      q.correctAnswer = q.choices[q.correctIndex];
+    } else {
+      q.correctAnswer = q.correctAnswer || null;
+    }
+    return q;
+  });
+
+  const payload = {
+    id: currentQuiz.id,
+    title: currentQuiz.title,
+    published: currentQuiz.published,
+    timeLimit: currentQuiz.timeLimit,
+    points: currentQuiz.points,
+    section: currentQuiz.section,
+    date: currentQuiz.date,
+    questions: currentQuiz.questions
+  };
+
+  saveStatus.textContent = 'Saving to server...';
+
+  try {
+    const res = await fetch(API_SAVE, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(data && data.status === "success"){
+      saveStatus.textContent = 'Saved successfully ✔';
+      currentQuiz.id = data.id || currentQuiz.id || uid();
+      await loadQuizzesFromServer();
+      updateCurrentQuizLabel();
+    } else {
+      saveStatus.innerHTML = `<span class="error">Save failed: ${data?.message || 'unknown'}</span>`;
+    }
+  } catch(err){
+    console.error(err);
+    saveStatus.innerHTML = `<span class="error">Save failed: server unreachable</span>`;
+  }
+});
+
+/* --------------------------
+   Prev / Next navigation
+   -------------------------- */
+prevQuestionBtn.addEventListener('click', ()=>{
+  if(currentQuestionIndex <= 0){ alert('This is the first question.'); return; }
+  currentQuestionIndex--;
+  populateFormFromQuestion(currentQuiz.questions[currentQuestionIndex]);
+  updateCurrentQuizLabel();
+});
+nextQuestionBtn.addEventListener('click', ()=>{
+  if(currentQuestionIndex >= currentQuiz.questions.length - 1){
+    currentQuestionIndex = currentQuiz.questions.length;
+    clearQuestionForm();
+    updateCurrentQuizLabel();
+    return;
+  }
+  currentQuestionIndex++;
+  populateFormFromQuestion(currentQuiz.questions[currentQuestionIndex]);
+  updateCurrentQuizLabel();
+});
+
+/* --------------------------
+   Clear / New quiz
+   -------------------------- */
+newQuizBtn.addEventListener('click', ()=>{
+  if(!confirm('Create a new quiz (this will clear current unsaved work)?')) return;
+  currentQuiz = { id:null, title:'', published:0, timeLimit:60, points:1, section:'', date:'', questions:[] };
+  currentQuestionIndex = 0;
+  quizTitle.value = '';
+  sectionSearch.value = '';
+  quizDate.value = '';
+  clearQuestionForm();
+  updateCurrentQuizLabel();
+});
+
+clearCurrentBtn.addEventListener('click', ()=> {
+  if(!confirm('Clear current question fields?')) return;
+  clearQuestionForm();
+});
+
+function clearQuestionForm(){
+  quizQuestion.value = '';
+  currentImageData = null;
+  quizImage.value = '';
+  imagePreview.style.display = 'none';
+  choicesList.innerHTML = '';
+  questionTypeSelect.value = 'multipleChoice';
+  for(let i=0;i<4;i++) addChoice('');
+  updatePreview();
+}
+
+/* --------------------------
+   Preview rendering
+   -------------------------- */
+/* --------------------------
+   Preview rendering (fixed with letters)
+   -------------------------- */
+function updatePreview(){
+  const qObj = getCurrentQuestionFromForm();
+  console.log("Previewing question:", qObj);  // 🐞 debug
+
+  previewQuestion.textContent = qObj.question || 'Question will appear here...';
+  
+  if(qObj.image){
+    previewImageElem.src = qObj.image;
+    previewImageElem.style.display = 'block';
+  } else {
+    previewImageElem.style.display = 'none';
+  }
+
+  previewOptions.innerHTML = '';
+  const mode = previewMode ? previewMode.value : 'student';
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  // ⚡ Flexible matching for multiple choice type
+  if(qObj.questionType && qObj.questionType.toLowerCase().includes('multiple')){
+    qObj.choices.forEach((c, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+
+      // 🅰 Add letter label
+      const label = `${letters[idx]}. ${c}`;
+
+      if(mode === 'teacher' && typeof qObj.correctIndex === 'number' && qObj.correctIndex === idx){
+        btn.textContent = label + ' ✅';
+        btn.classList.add('teacher-correct');
+      } else {
+        btn.textContent = label;
+      }
+
+      btn.onclick = ()=> {
+        studentAnswers[qObj.question] = c;
+        if(mode === 'student'){
+          const correct = (typeof qObj.correctIndex === 'number' && qObj.choices[qObj.correctIndex] === c);
+          alert(correct ? 'Correct!' : 'Wrong');
+        }
+      };
+
+      previewOptions.appendChild(btn);
+    });
+  }
+  else if(qObj.questionType && qObj.questionType.toLowerCase().includes('true')){
+    ['True','False'].forEach((v, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = v;
+      if(mode === 'teacher' && typeof qObj.correctIndex === 'number' && qObj.correctIndex === idx){
+        btn.textContent = v + ' ✅';
+        btn.classList.add('teacher-correct');
+      }
+      btn.onclick = ()=> {
+        studentAnswers[qObj.question] = v;
+        if(mode === 'student'){
+          const correct = (typeof qObj.correctIndex === 'number' && qObj.correctIndex === idx);
+          alert(correct ? 'Correct!' : 'Wrong');
+        }
+      };
+      previewOptions.appendChild(btn);
+    });
+  }
+  else if(qObj.questionType && qObj.questionType.toLowerCase().includes('short')){
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.placeholder = 'Type your short answer...';
+    inp.style.padding = '8px';
+    inp.oninput = ()=> studentAnswers[qObj.question] = inp.value;
+    previewOptions.appendChild(inp);
+  }
+  else if(qObj.questionType && qObj.questionType.toLowerCase().includes('essay')){
+    const ta = document.createElement('textarea');
+    ta.rows = 6;
+    ta.placeholder = 'Write your essay answer...';
+    ta.style.padding = '8px';
+    ta.oninput = ()=> studentAnswers[qObj.question] = ta.value;
+    previewOptions.appendChild(ta);
+  }
+}
+
+
+/* play preview of saved quiz questions */
+playQuizBtn.addEventListener('click', ()=>{
+  if(!currentQuiz.questions.length){ alert('No questions in current quiz to preview.'); return; }
+  let idx = 0;
+  const show = ()=> {
+    const q = currentQuiz.questions[idx];
+    if(!q) return;
+    populateFormFromQuestion(q);
+    previewMode.value = 'student';
+    updatePreview();
+    if(confirm(`Answer preview question ${idx+1}. Go to next?`)){
+      idx++;
+      if(idx < currentQuiz.questions.length) show(); else alert('End of preview.');
+    }
+  };
+  show();
+});
+
+
+/* --------------------------
+   Server: load, delete operations
+   -------------------------- */
+async function loadQuizzesFromServer(){
+  quizList.innerHTML = '<li style="padding:10px;color:#666">Loading...</li>';
+  try {
+    const res = await fetch(API_LOAD, { method: 'GET' });
+    const data = await res.json();
+    if(Array.isArray(data)){
+      quizzes = data;
+      renderQuizList();
+    } else {
+      quizList.innerHTML = `<li style="padding:10px;color:${data.message?'#d00':'#666'}">${data.message || 'No quizzes'}</li>`;
+    }
+  } catch(err){
+    console.error(err);
+    quizList.innerHTML = `<li style="padding:10px;color:#d00">Failed to load quizzes</li>`;
+  }
+}
+refreshListBtn.addEventListener('click', loadQuizzesFromServer);
+
+function renderQuizList(){
+  quizList.innerHTML = '';
+  if(!quizzes.length){
+    quizList.innerHTML = '<li style="padding:10px;color:#666">No saved quizzes yet.</li>';
+    return;
+  }
+  quizzes.forEach((q, idx) => {
+    const li = document.createElement('li'); li.className='quiz-item';
+    const title = q.title || 'Untitled Quiz';
+    const count = (q.questions? q.questions.length : (q.question?1:0));
+    const left = document.createElement('div'); left.style.flex='1';
+    left.innerHTML = `<strong style="display:block">${escapeHtml(title)}</strong>
+      <div class="meta">${count} question(s) • ${escapeHtml(q.section||'No section')} ${q.published? ' • Published':''}</div>`;
+    const actions = document.createElement('div'); actions.className='quiz-actions';
+    const openBtn = document.createElement('button'); openBtn.textContent='Open'; openBtn.onclick = (ev)=> { ev.stopPropagation(); handleLoadQuiz(idx); };
+    const delBtn = document.createElement('button'); delBtn.textContent='✖'; delBtn.style.color='var(--danger)'; delBtn.onclick = (ev)=> { ev.stopPropagation(); handleDeleteQuiz(q.id); };
+    actions.appendChild(openBtn); actions.appendChild(delBtn);
+    li.appendChild(left); li.appendChild(actions);
+    li.onclick = ()=> handleLoadQuiz(idx);
+    quizList.appendChild(li);
+  });
+}
+
+window.handleLoadQuiz = function(idx){
+  const q = quizzes[idx];
+  if(!q) return;
+  currentQuiz = JSON.parse(JSON.stringify(q));
+  currentQuiz.id = currentQuiz.id || uid();
+  currentQuestionIndex = 0;
+  if(document.getElementById('quizTitle')) quizTitle.value = currentQuiz.title || '';
+  if(timeLimitSelect) timeLimitSelect.value = currentQuiz.timeLimit || 60;
+  if(pointsSelect) pointsSelect.value = currentQuiz.points || 1;
+  sectionSearch.value = currentQuiz.section || '';
+  quizDate.value = currentQuiz.date || '';
+  if(currentQuiz.questions && currentQuiz.questions.length){
+    populateFormFromQuestion(currentQuiz.questions[0]);
+  } else {
+    clearQuestionForm();
+  }
+  updateCurrentQuizLabel();
+  saveStatus.textContent = 'Loaded quiz from server (unsaved changes will override).';
+};
+
+/* --------------------------
+   Auto Update Quiz List (Title Preview)
+   -------------------------- */
+quizTitle.addEventListener('input', () => {
+  const title = quizTitle.value.trim();
+  const previewItem = document.getElementById('temp-preview-item');
+
+  if (!title) {
+    if (previewItem) previewItem.remove();
+    return;
+  }
+
+  if (previewItem) {
+    previewItem.querySelector('strong').textContent = title;
+  } else {
+    const li = document.createElement('li');
+    li.id = 'temp-preview-item';
+    li.style.padding = '10px';
+    li.innerHTML = `<strong>${escapeHtml(title)}</strong><div class="meta">0 question(s) • Not saved</div>`;
+    quizList.prepend(li);
+  }
+});
+
+
+
+window.handleDeleteQuiz = async function(id){
+  if(!confirm('Delete this quiz from server?')) return;
+  try {
+    const res = await fetch(API_DELETE, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ id })
+    });
+    const data = await res.json();
+    if(data && data.status === 'success'){
+      alert('Deleted.');
+      await loadQuizzesFromServer();
+    } else {
+      alert('Delete failed: ' + (data?.message || 'unknown'));
+    }
+  } catch(err){
+    console.error(err);
+    alert('Server error during delete.');
+  }
+};
+
+/* --------------------------
+   UI helpers
+   -------------------------- */
+function updateCurrentQuizLabel(){
+  currentQuizLabel.textContent = currentQuiz.title ? `${currentQuiz.title} (${currentQuiz.questions.length} q)` : `Untitled (${currentQuiz.questions.length} q)`;
+}
+function renderLocalQuizItemCount(){ updateCurrentQuizLabel(); }
+
+/* --------------------------
+   Init: defaults and bindings
+   -------------------------- */
+function init(){
+  // create 4 choice inputs by default
+  choicesList.innerHTML = '';
+  for(let i=0;i<4;i++) addChoice('');
+  updatePreview();
+  updateCurrentQuizLabel();
+  loadQuizzesFromServer();
+}
+init();
+
+/* live preview triggers */
+quizQuestion.addEventListener('input', updatePreview);
+choicesList.addEventListener('input', updatePreview);
+questionTypeSelect.addEventListener('change', ()=>{
+  const t = questionTypeSelect.value;
+  choicesList.innerHTML = '';
+  if(t === 'multipleChoice'){ for(let i=0;i<4;i++) addChoice(''); }
+  else if(t === 'trueFalse'){ choicesList.appendChild(createChoiceInput('True', true, true)); choicesList.appendChild(createChoiceInput('False', false, true)); }
+  else if(t === 'shortAnswer'){ const ta = document.createElement('textarea'); ta.rows=3; ta.placeholder='Type the expected short answer (optional)'; choicesList.appendChild(ta); }
+  else if(t === 'essay'){ const ta = document.createElement('textarea'); ta.rows=6; ta.placeholder='Example essay points (optional)'; choicesList.appendChild(ta); }
+  updatePreview();
+});
+timeLimitSelect.addEventListener('change', ()=> currentQuiz.timeLimit = Number(timeLimitSelect.value));
+pointsSelect.addEventListener('change', ()=> currentQuiz.points = Number(pointsSelect.value));
+sectionSearch.addEventListener('input', ()=> currentQuiz.section = sectionSearch.value);
+quizDate.addEventListener('change', ()=> currentQuiz.date = quizDate.value);
+previewMode.addEventListener('change', updatePreview);
+
+/* expose some functions */
+window.loadQuizzesFromServer = loadQuizzesFromServer;
+window.clearQuestionForm = clearQuestionForm;
+
+/* --------------------------
+   Import / Export JSON
+   -------------------------- */
+function exportCurrentQuiz(){
+  const data = JSON.stringify(currentQuiz, null, 2);
+  const blob = new Blob([data], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = (currentQuiz.title||'quiz')+'.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+function importQuizFile(file){
+  const reader = new FileReader();
+  reader.onload = ()=> {
+    try{
+      const obj = JSON.parse(reader.result);
+      if(obj && obj.questions){
+        currentQuiz = obj;
+        quizTitle.value = currentQuiz.title || '';
+        sectionSearch.value = currentQuiz.section || '';
+        quizDate.value = currentQuiz.date || '';
+        timeLimitSelect.value = currentQuiz.timeLimit || 60;
+        pointsSelect.value = currentQuiz.points || 1;
+        currentQuestionIndex = 0;
+        if(currentQuiz.questions.length) populateFormFromQuestion(currentQuiz.questions[0]);
+        updateCurrentQuizLabel();
+        saveStatus.textContent = 'Imported quiz (not saved to server).';
+      } else alert('Invalid quiz file.');
+    } catch(e){ alert('Invalid JSON file.'); }
+  };
+  reader.readAsText(file);
+}
+
+/* expose export/import buttons (optional UI hook) */
+window.exportCurrentQuiz = exportCurrentQuiz;
+window.importQuizFile = importQuizFile;
+
+/* ============================
+   Choice selection behavior
+   ============================ */
+document.addEventListener("click", (e) => {
+  const choiceLabel = e.target.closest(".choice-option label");
+  if (!choiceLabel) return;
+
+  const choiceContainer = choiceLabel.closest(".choice-option");
+  const allChoices = choiceContainer.parentElement.querySelectorAll(".choice-option label");
+  const isTrueFalse = choiceContainer.classList.contains("tf");
+
+  // Skip highlight logic for True/False (they use normal radios)
+  if (isTrueFalse) return;
+
+  // Remove highlight from others
+  allChoices.forEach((lbl) => lbl.classList.remove("selected"));
+
+  // Highlight clicked choice
+  choiceLabel.classList.add("selected");
+
+  // Mark as correct (simulate radio selection)
+  const radioInput = choiceLabel.previousElementSibling;
+  if (radioInput) radioInput.checked = true;
+});
+
+// ===========================
+// FIXED QUIZ CREATION LOGIC
+// ===========================
+
+// Keep quiz data here
+let current_Quiz = {
+  title: '',
+  section: '',
+  date: '',
+  timeLimit: 0,
+  points: 0,
+  questions: []
+};
+
+// Temporary storage for current question
+let currentQuestion = {
+  question_text: '',
+  options: [],
+  correct_option: ''
+};
+
+// ========== ADD CHOICE ==========
+document.getElementById('addChoiceBtn').addEventListener('click', () => {
+  const list = document.getElementById('choicesList');
+
+  // Create a choice input
+  const div = document.createElement('div');
+  div.className = 'choice-item';
+  div.innerHTML = `
+    <input type="text" class="choiceText" placeholder="Choice text" />
+    <input type="radio" name="correctChoice" />
+    <button type="button" class="removeChoice">✖</button>
+  `;
+
+  // Remove choice button
+  div.querySelector('.removeChoice').addEventListener('click', () => {
+    div.remove();
+  });
+
+  list.appendChild(div);
+});
+
+// ========== ADD QUESTION TO QUIZ ==========
+document.getElementById('addQuestionToQuizBtn').addEventListener('click', () => {
+  const questionText = document.getElementById('quizQuestion').value.trim();
+  const choices = document.querySelectorAll('.choiceText');
+  const correctRadio = document.querySelectorAll('input[name="correctChoice"]');
+
+  if (!questionText) {
+    alert('Please enter a question.');
+    return;
+  }
+  if (choices.length < 2) {
+    alert('Add at least two choices.');
+    return;
+  }
+
+  let options = [];
+  let correctOption = '';
+
+  choices.forEach((input, index) => {
+    const text = input.value.trim();
+    if (text) {
+      options.push(text);
+      if (correctRadio[index].checked) correctOption = text;
+    }
+  });
+
+  if (!correctOption) {
+    alert('Please select the correct answer.');
+    return;
+  }
+
+  // Add question to quiz
+  currentQuiz.questions.push({
+    question_text: questionText,
+    option_a: options[0] || '',
+    option_b: options[1] || '',
+    option_c: options[2] || '',
+    option_d: options[3] || '',
+    correct_option: correctOption
+  });
+
+  alert('✅ Question added to quiz.');
+
+  // Clear fields
+  document.getElementById('quizQuestion').value = '';
+  document.getElementById('choicesList').innerHTML = '';
+});
+
+// ========== SAVE QUIZ ==========
+document.getElementById('saveQuizBtn').addEventListener('click', async () => {
+  currentQuiz.title = document.getElementById('quizTitle').value.trim();
+  currentQuiz.section = document.getElementById('sectionSearch').value.trim();
+  currentQuiz.date = document.getElementById('quizDate').value;
+  currentQuiz.timeLimit = parseInt(document.getElementById('timeLimit').value);
+  currentQuiz.points = parseInt(document.getElementById('points').value);
+
+  if (!currentQuiz.title || !currentQuiz.section || !currentQuiz.date) {
+    alert('Please fill in all quiz details before saving.');
+    return;
+  }
+
+  if (currentQuiz.questions.length === 0) {
+    if (!confirm('⚠️ You have no questions in this quiz. Save empty quiz?')) return;
+  }
+
+  try {
+    const res = await fetch("http://localhost/AI-ADAPTIVE/save_quiz.php", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(currentQuiz)
+});
+
+    const result = await res.json();
+
+    if (result.success) {
+      alert('🎉 Quiz saved successfully!');
+      currentQuiz = { title: '', section: '', date: '', timeLimit: 0, points: 0, questions: [] };
+      document.getElementById('quizForm').reset();
+      document.getElementById('choicesList').innerHTML = '';
+    } else {
+      alert('❌ Failed to save quiz: ' + result.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Error saving quiz.');
+  }
+});
+
+
+</script>
+
+</body>
+</html>

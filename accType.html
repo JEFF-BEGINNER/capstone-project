@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login | Poblacion NHS</title>
+  <link rel="stylesheet" href="accType.Style.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- LEFT SIDE -->
+    <div class="left">
+      <img src="image/school_logo.jpg" alt="School Logo" />
+      <h2>
+        AI-Powered Adaptive Quiz System<br />
+        <span>with Real-Time Performance Analytics</span><br />
+        for Grade 10 Students
+      </h2>
+      <p>Poblacion National High School</p>
+      <button class="signup-btn" type="button">SIGN UP</button>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="right">
+      <div class="form-box">
+        <h2 id="form-title">Choose Your Account Type</h2>
+        <p id="form-subtitle">Please select Teacher or Student</p>
+
+        <!-- Account Type Selection -->
+        <div class="account-type" id="account-choice">
+          <div class="card" onclick="chooseAccount('Teacher')">
+            <img src="Image/professor_1154993.png" alt="Teacher" />
+            <span>Teacher</span>
+          </div>
+          <div class="card" onclick="chooseAccount('Student')">
+            <img src="Image/graduate_8289000.png" alt="Student" />
+            <span>Student</span>
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <form method="POST" action="login.php" id="login-form" class="hidden">
+          <button type="button" class="back-btn" onclick="goBack()">← Back</button>
+          <input type="hidden" name="account_type" value="" />
+          <div class="input-field">
+            <input type="text" name="student_number" placeholder="Email or ID" required autocomplete="username" />
+          </div>
+          <div class="input-field">
+            <input type="password" name="password" placeholder="Password" required autocomplete="current-password" />
+          </div>
+          <div class="forgot">Forgot your Password?</div>
+          <button type="submit" class="signin-btn">SIGN IN</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let selectedAccountType = null;
+
+      // Select account type
+      window.chooseAccount = function(type) {
+        selectedAccountType = type;
+
+        // Update signup button
+        document.querySelector(".signup-btn").innerText = `SIGN UP as ${type.toUpperCase()}`;
+
+        // Update form titles
+        document.getElementById("form-title").innerText = `Welcome Back, ${type}`;
+        document.getElementById("form-subtitle").innerText = `Sign in to continue as ${type}`;
+
+        // Show login form
+        document.getElementById("account-choice").classList.add("hidden");
+        const loginForm = document.getElementById("login-form");
+        loginForm.classList.remove("hidden");
+        loginForm.classList.add("slide-in");
+
+        loginForm.querySelector('input[name="account_type"]').value = type;
+      };
+
+      // Go back to account choice
+      window.goBack = function() {
+        selectedAccountType = null;
+
+        document.querySelector(".signup-btn").innerText = "SIGN UP";
+        document.getElementById("form-title").innerText = "Choose Your Account Type";
+        document.getElementById("form-subtitle").innerText = "Please select Teacher or Student";
+
+        const loginForm = document.getElementById("login-form");
+        loginForm.classList.add("hidden");
+        document.getElementById("account-choice").classList.remove("hidden");
+
+        loginForm.reset();
+      };
+
+      // Signup button redirect
+      document.querySelector(".signup-btn").addEventListener("click", () => {
+        if (!selectedAccountType) {
+          alert("Please select Teacher or Student first.");
+          return;
+        }
+        if (selectedAccountType === "Teacher") {
+          window.location.href = "signupTeacher.php";
+        } else {
+          window.location.href = "signupstudent.php";
+        }
+      });
+    });
+  </script>
+</body>
+</html>

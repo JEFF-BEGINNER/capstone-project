@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Login</title>
+  <link rel="stylesheet" href="Login.css" />
+</head>
+<body>
+  <div class="login-container">
+    <form class="login-form" method="post" action="login.php">
+      <h2>Student Login</h2>
+
+      <!-- Error message (optional, lalabas kung may ?error=1 sa URL) -->
+      <?php if (isset($_GET['error'])): ?>
+        <p class="error-message">
+          <?php 
+            if ($_GET['error'] == 1) {
+              echo "Invalid email or password.";
+            } elseif ($_GET['error'] == 2) {
+              echo "Please log in first.";
+            }
+          ?>
+        </p>
+      <?php endif; ?>
+
+      <label for="email">Email address</label>
+      <input type="email" id="email" name="email" placeholder="Enter email address" required />
+
+      <label for="password">Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" name="password" placeholder="Enter password" required />
+      </div>
+
+      <div class="options">
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="login-btn">Sign in</button>
+
+      <div class="footer-text">
+        <p>Don't have an account? <a href="">Sign up</a></p>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

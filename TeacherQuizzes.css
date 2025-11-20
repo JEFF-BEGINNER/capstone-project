@@ -1,0 +1,316 @@
+/* Quizzes Section Layout */
+.quizzes-section {
+  padding: 24px 0;
+}
+
+/* Quiz Buttons */
+.quiz-buttons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.quiz-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.quiz-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.quiz-btn.active {
+  background-color: #a259e6;
+  color: #fff;
+}
+
+/* Quiz List */
+.quiz-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Quiz Card */
+.quiz-card {
+  background: linear-gradient(90deg, #e754e7 0%, #a259e6 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(160, 89, 230, 0.10);
+  padding: 24px 32px;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  margin-bottom: 0;
+  position: relative;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.quiz-card:hover {
+  box-shadow: 0 8px 32px rgba(160, 89, 230, 0.18);
+  transform: translateY(-4px) scale(1.01);
+}
+
+.quiz-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.quiz-meta {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 8px;
+  font-size: 1rem;
+}
+
+.quiz-meta span {
+  background: #fff;
+  color: #a259e6;
+  border-radius: 6px;
+  padding: 2px 12px;
+  font-size: 0.98rem;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.quiz-subject {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 10px;
+  color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .quiz-card {
+    padding: 16px 10px;
+  }
+  .quiz-title {
+    font-size: 1.3rem;
+  }
+  .quiz-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Style for the quiz section select to match Class Report select */
+select.class-list,
+#quiz-section-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  display: inline-block;
+  min-width: 180px;
+  max-width: 320px;
+  padding: 10px 40px 10px 12px; /* space for right arrow */
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background-color: #fff;
+  color: #222;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+
+  /* subtle drop shadow like Class Report box */
+  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+
+  /* custom arrow (SVG) on the right */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19.5 8.25 L12 15.75 L4.5 8.25'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+
+/* Remove native arrow in IE/Edge (old) */
+select.class-list::-ms-expand,
+#quiz-section-select::-ms-expand { display: none; }
+
+/* Focus state */
+select.class-list:focus,
+#quiz-section-select:focus {
+  outline: none;
+  border-color: rgba(155,38,182,0.9);
+  box-shadow: 0 6px 18px rgba(155,38,182,0.08), 0 0 0 3px rgba(155,38,182,0.08);
+}
+
+@media (max-width: 520px) {
+  select.class-list,
+  #quiz-section-select {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    padding-right: 36px;
+    font-size: 14px;
+  }
+}
+
+.secondary-sidebar {
+    position: fixed;
+    top: 0;
+    left: 260px;
+    width: 92px;
+    height: 100vh;
+    background: #ffffff;
+    border-right: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 18px;
+    gap: 12px;
+    transition: transform 0.28s ease, opacity 0.28s ease;
+    z-index: 60;
+}
+.secondary-sidebar.classes {
+    width: 140px;
+    padding-top: 8px;
+    align-items: stretch;
+}
+
+.secondary-sidebar.classes .ss-top {
+    display: flex;
+    justify-content: flex-start;
+    padding: 6px 8px;
+}
+
+.ss-hamburger {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    padding: 6px 8px;
+    cursor: pointer;
+}
+
+.ss-class-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 8px;
+    overflow-y: auto;
+    max-height: calc(100vh - 140px);
+}
+
+.ss-class-item {
+    text-align: left;
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 10px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+}
+
+.ss-class-item:hover { background: rgba(0,0,0,0.04); }
+
+.ss-class-item.active {
+    background: #efefef;
+    color: #000;
+}
+
+/* keep the small rail icons at the bottom */
+.secondary-sidebar .ss-rail { 
+  margin-top: auto; 
+  padding: 12px 8px 18px; 
+  display:flex; flex-direction: column; 
+  gap:8px; 
+  align-items:center; 
+}
+
+@media (max-width: 900px) {
+    .secondary-sidebar.classes { 
+      width: 260px; 
+    }
+}
+
+.secondary-sidebar .ss-item {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #333333;
+    background: transparent;
+    transition: background 0.18s, transform 0.18s;
+    font-size: 22px;
+}
+.secondary-sidebar .ss-item:hover { 
+  background: #f0f4ff; 
+  transform: translateY(-3px); 
+}
+
+.secondary-sidebar.collapsed { 
+  transform: translateX(-120%); 
+  opacity: 0; 
+  pointer-events: none; 
+}
+
+/* expanded panel to show sections select */
+.secondary-sidebar.has-sections { 
+  width: 320px; 
+  align-items: flex-start; 
+  padding: 18px; 
+}
+
+.secondary-sidebar .ss-section { 
+  width: 100%; 
+  margin-bottom: 18px; 
+}
+
+.secondary-sidebar .ss-section .ss-section-title { 
+  margin: 0 0 8px 0; 
+  font-size: 14px; 
+  color: #333; 
+}
+
+.secondary-sidebar .ss-section select.class-list { 
+  width: 100%; 
+  max-width: 100%; 
+  padding: 10px 12px; 
+  border-radius: 10px; 
+  border: 1px solid rgba(0,0,0,0.08); 
+  box-shadow: 0 6px 14px rgba(0,0,0,0.04); 
+  background-color: #fff; 
+  font-weight: 600; }
+
+main.content.with-secondary { 
+  margin-left: calc(260px + 92px); 
+}
+
+@media (max-width: 900px) {
+    .secondary-sidebar {
+      left: 0;
+      width: 260px;
+      transform: translateX(-120%);
+      -webkit-transform: translateX(-120%);
+      -moz-transform: translateX(-120%);
+      -ms-transform: translateX(-120%);
+      -o-transform: translateX(-120%);
+}
+    
+    .secondary-sidebar.open { 
+      transform: translateX(0); 
+      opacity: 1; 
+      pointer-events: auto; 
+    }
+
+    .secondary-sidebar.has-sections { 
+      width: 260px; 
+    }
+
+    main.content.with-secondary { 
+      margin-left: 260px; 
+    }
+}
